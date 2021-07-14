@@ -99,29 +99,48 @@ func main() {
 
 	//Lets play a bit more with the uuid
 	gstr := "7ff5f446-9afe-4b33-b9dc-e2c33f2452f4"
-	uuid, err := WorkWithUniqueIdentifierStruct(gstr)
+	u, err := WorkWithUniqueIdentifierStruct(gstr)
 	if err != nil {
 		log.Fatal("Error parsing Guid: ", err.Error())
 	}
-	fmt.Printf("gstr: %s, uuid is %s\n", gstr, uuid)
+	fmt.Printf("gstr: %s, uuid is %s\n", gstr, u)
 
 	//throw in some casing
 	gstr = "7FF5F446-9AFE-4B33-b9dc-e2c33f2452f4"
-	uuid, err = WorkWithUniqueIdentifierStruct(gstr)
+	u2, err := WorkWithUniqueIdentifierStruct(gstr)
 	if err != nil {
 		log.Fatal("Error parsing Guid: ", err.Error())
 	}
 	//so based off what I'm seeing, this code's tostring puts this as all caps
-	fmt.Printf("gstr: %s, uuid is %s\n", gstr, uuid)
+	fmt.Printf("gstr: %s, uuid is %s\n", gstr, u2)
 
-	//<BUT> since this puts the string past the 36 character length
-	//it's not exactly robust enough to handle curly braces
-	gstr = "{7FF5F446-9AFE-4B33-b9dc-e2c33f2452f4}"
-	uuid, err = WorkWithUniqueIdentifierStruct(gstr)
+	//different guid
+	gstr = "7FF5F446-9AFE-4B33-FFFF-e2c33f2452f4"
+	u3, err := WorkWithUniqueIdentifierStruct(gstr)
 	if err != nil {
 		log.Fatal("Error parsing Guid: ", err.Error())
 	}
-	fmt.Printf("gstr: %s, uuid is %s\n", gstr, uuid)
+	fmt.Printf("gstr: %s, uuid is %s\n", gstr, u3)
+
+	fmt.Printf("Comparison between UUID '%s' vs '%s' := %t\n", u, u2, u == u2)
+
+	//ok so thankfully comparisons are sane with this stuff.....
+	fmt.Printf("Comparison between UUID '%s' vs '%s' := %t\n", u, u3, u == u3)
+
+	//<BUT> since this puts the string past the 36 character length
+	//it's not exactly robust enough to handle curly braces
+	// (e.g. this would break when passing it guids from the VS guid creation tool)
+	//
+	//  <BUT> at least it recog
+	//
+	// next step: see if there is a slightly different uuid declaration
+	// (or take this guys code and add some additional parsing logic )
+	gstr = "{7FF5F446-9AFE-4B33-b9dc-e2c33f2452f4}"
+	u, err = WorkWithUniqueIdentifierStruct(gstr)
+	if err != nil {
+		log.Fatal("Error parsing Guid: ", err.Error())
+	}
+	fmt.Printf("gstr: %s, uuid is %s\n", gstr, u)
 
 }
 
