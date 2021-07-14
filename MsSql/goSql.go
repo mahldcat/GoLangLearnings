@@ -1,9 +1,26 @@
 package main
 
+/*
+This is based off an article from here:
+https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-go
+
+This is querying an MSSQL db with the following table schema:
+
+CREATE TABLE [gluser].[Tasks](
+	[id] [uniqueidentifier] NULL,
+	[msg] [nvarchar](2048) NULL,
+	[lastupdate] [datetime] NULL,
+	[status] [nvarchar](50) NULL,
+	[percentcomplete] [int] NULL
+)
+
+
+*/
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"time"
 
@@ -16,15 +33,19 @@ var db *sql.DB
 var server = "A2NWPLSK14SQL-v05.shr.prod.iad2.secureserver.net"
 var port = 1433
 var user = "gluser"
-var password = "<<REDACTED>>"
 var database = "GoLangDB"
 
 func main() {
+	var err error
+
+	password, err := ioutil.ReadFile("/home/mahldcat/pass")
+	if err != nil {
+		log.Fatal("Error fetching password file:", err.Error())
+	}
+
 	// Build connection string
 	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s;",
 		server, user, password, port, database)
-
-	var err error
 
 	// Create connection pool
 	db, err = sql.Open("sqlserver", connString)
@@ -43,6 +64,8 @@ func main() {
 		log.Fatal("Error Fetching Tasks: ", err.Error())
 	}
 	fmt.Printf("Read %d row(s).\n", count)
+
+	db.Close()
 
 }
 
